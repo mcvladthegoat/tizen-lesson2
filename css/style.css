@@ -1,24 +1,7 @@
-html,
-body {
-    width: 100%;
-    height: 100%;
+.popup-content-padding {
+	padding: 18px 24px;
+}
+#tizenpic{
+    display: block;
     margin: 0 auto;
-    padding: 0;
-    background-color: #222222;
-    color: #ffffff;
-}
-.page {
-    width: 100%;
-    height: 100%;
-    display: table;
-}
-.contents {
-    display: inline;
-    vertical-align: middle;
-    text-align: center;
-    -webkit-tap-highlight-color: transparent;
-}
-#content-text {
-    font-weight: bold;
-    font-size: 5em;
 }
