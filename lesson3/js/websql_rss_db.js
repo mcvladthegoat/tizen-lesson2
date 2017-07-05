@@ -9,7 +9,7 @@ window.onload = function () {
 
 
 var baseName 	  = "WebBase";
-var storeName 	  = "WebBaseStore";
+var storeName 	  = "WebBaseStore4";
 
 
 
@@ -34,7 +34,7 @@ function getFeed(){
 		});
 
 		function xmlParser(xml) {
-
+			
 			indicator.style.display = "none";
 
 		    $(xml).find("item").each(function () {
@@ -46,9 +46,10 @@ function getFeed(){
 
 		    	  var self = this;
 		    	  convertImgToDataURLviaCanvas($(this).find("enclosure").attr('url'), 
-		    	   function(t){ 
-		    		  arr[i] = { title:$(self).find("title").text(), description:$(self).find("description").text(), image: t};
-		    		  console.info("HEYYA", t.length);
+		    	   function(dataURL){ 
+		    		  console.info("SUUKA", $(self).find("title").text());
+		    		  arr[i] = { title:$(self).find("title").text(), description:$(self).find("description").text(), image: dataURL, pubdate: $(self).find("pubDate").text()};
+		    		  console.info("HEYYA", arr[i]);
 		    		  setData(arr[i]); // чем плоха данная схема? переделать на передачу массива.
 		    	  });
 		          
@@ -72,14 +73,14 @@ function getFeed(){
      	
      	
          
-         function setData(title_, description_, image_){
+         function setData(arr){
 
         	 db.transaction(function (tx) {
- tx.executeSql('CREATE TABLE IF NOT EXISTS ' + storeName + ' (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, image TEXT)', [],
+ tx.executeSql('CREATE TABLE IF NOT EXISTS ' + storeName + ' (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, image TEXT, pubdate TEXT)', [],
 		 null,
 		 null);            
 
-  tx.executeSql('INSERT INTO ' + storeName + ' (title, description, image) VALUES (?, ?, ?)', [title_, description_, image_], null, onError);
+  tx.executeSql('INSERT INTO ' + storeName + ' (title, description, image, pubdate) VALUES (?, ?, ?, ?)', [ arr["title"], arr["description"], arr["image"], arr["pubdate"] ], null, onError);
          });
          };
          
@@ -93,7 +94,9 @@ function getFeed(){
                for (i = 0; i < len; i++){
             	   console.log("CHECK ME", results.rows.item(i));
                   msg = "<p><b>" + results.rows.item(i).title + "</b></p>";
-                  $("#rssContent").append(msg);
+                  $("#rssContent").append('<div class="feed"><div class="image"><img src=' + results.rows.item(i).image 
+                		  + ' width=' + width + 'px /><div class="title"> Title:' + results.rows.item(i).title 
+			        		+ '</div><br><div class="description">Desc: ' + results.rows.item(i).description + '</div><br><i>' + results.rows.item(i).pubdate + '</i></div>');
                }
             }, onError);              
          });
@@ -102,7 +105,6 @@ function getFeed(){
          
          function convertImgToDataURLviaCanvas(url, callback, outputFormat) {
        	  var img = new Image();
-       	  var r;
        	  img.crossOrigin = 'Anonymous';
        	  img.onload = function() {
        	    var canvas = document.createElement('CANVAS');
@@ -112,7 +114,6 @@ function getFeed(){
        	    canvas.width = this.width / 5;
        	    ctx.drawImage(this, 0, 0);
        	    dataURL = canvas.toDataURL(outputFormat);
-       	    r = dataURL;
        	    callback(dataURL);
        	    canvas = null;
        	  };
